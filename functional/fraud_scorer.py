@@ -31,17 +31,26 @@ class FraudVariables:
     risk_score: Int
 
 
-def build_fraud_solver() -> Tuple[Solver, FraudVariables]:
-    """Create the solver with all baseline constraints for reuse."""
+def build_fraud_solver(name_prefix: str = "") -> Tuple[Solver, FraudVariables]:
+    """Create the solver with all baseline constraints for reuse.
+
+    Args:
+        name_prefix: Optional prefix applied to every Z3 symbol. Ethical proofs
+            can build multiple applicants within the same solver by supplying
+            unique prefixes (e.g., "a_", "b_").
+    """
 
     solver = Solver()
 
-    income = Int("income")
-    payment_errors = Int("payment_errors")
-    uses_intermediary = Bool("uses_intermediary")
-    is_dual_national = Bool("is_dual_national")
-    on_fsv_blacklist = Bool("on_fsv_blacklist")
-    risk_score = Int("risk_score")
+    def _name(base: str) -> str:
+        return f"{name_prefix}{base}" if name_prefix else base
+
+    income = Int(_name("income"))
+    payment_errors = Int(_name("payment_errors"))
+    uses_intermediary = Bool(_name("uses_intermediary"))
+    is_dual_national = Bool(_name("is_dual_national"))
+    on_fsv_blacklist = Bool(_name("on_fsv_blacklist"))
+    risk_score = Int(_name("risk_score"))
 
     vars = FraudVariables(
         income=income,
