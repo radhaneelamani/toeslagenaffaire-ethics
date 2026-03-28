@@ -5,7 +5,7 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from z3 import Bool, Solver, unsat
+from z3 import Bool, Solver, unsat, Implies
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
@@ -23,18 +23,15 @@ def build_due_process_solver() -> Solver:
 	explanation_suppressed = Bool("explanation_suppressed")
 	appeal_blocked = Bool("appeal_blocked")
 
-	# GDPR Article 22 requirements.
-	solver.add(explanation_provided == True)
-	solver.add(human_review_before_action == True)
-	solver.add(appeal_pathway_communicated == True)
+	# GDPR Article 22 requirements
+	solver.add(Implies(system_fully_automated, explanation_provided == True))
+	solver.add(Implies(system_fully_automated, human_review_before_action == True))
+	solver.add(Implies(system_fully_automated, appeal_pathway_communicated == True))
 
-	# Operational realities of the Toeslagen system.
+	# System operational realities
 	solver.add(system_fully_automated == True)
-	solver.add(explanation_suppressed == True)
-	solver.add(appeal_blocked == True)
-
-	solver.add(human_review_before_action == False)
 	solver.add(explanation_provided == False)
+	solver.add(human_review_before_action == False)
 	solver.add(appeal_pathway_communicated == False)
 
 	solver.add(explanation_suppressed == (explanation_provided == False))

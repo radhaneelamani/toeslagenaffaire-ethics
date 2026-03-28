@@ -42,9 +42,6 @@ def build_discrimination_solver() -> Tuple[Solver, FraudVariables, FraudVariable
     solver.add(applicant_a.is_dual_national == False)
     solver.add(applicant_b.is_dual_national == True)
 
-    solver.add(applicant_a.risk_score >= FRAUD_THRESHOLD)
-    solver.add(applicant_b.risk_score >= FRAUD_THRESHOLD)
-
     # Kantian fairness requirement: identical applicants must be treated equally.
     solver.add(applicant_a.risk_score == applicant_b.risk_score)
 
